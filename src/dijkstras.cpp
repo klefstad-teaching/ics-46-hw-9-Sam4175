@@ -14,7 +14,6 @@ struct CompareDist {
     }
 };
 
-
 vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& previous) {
     int n = G.numVertices;
     vector<int> dist(n, INF);        // Track the shortest distance to each vertex
@@ -54,7 +53,6 @@ vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& prev
     return dist; // Contains the shortest distances from 'source' to each vertex
 }
 
-
 vector<int> extract_shortest_path(const vector<int>& /*distances*/, const vector<int>& previous, int destination) {
     vector<int> path;
     int curr = destination;
@@ -65,28 +63,21 @@ vector<int> extract_shortest_path(const vector<int>& /*distances*/, const vector
         curr = previous[curr];
     }
 
-    // If the path only has 'destination' and no valid predecessor,
-    // it means there's no route (unless destination was the source).
-    // Typically, we'd also check if distances[destination] == INF
-    // before calling this function to confirm a valid path.
-
     // The path is currently reversed (from destination to source), so reverse it
     reverse(path.begin(), path.end());
     return path;
 }
 
 void print_path(const vector<int>& v, int total) {
-    // if (v.empty()) {
-    //     // cout << endl;  // printing blank line
-    //     cout << "\n";
-    // }
+    if (v.empty()) {
+        cout << "\n";
+    } else {
+        for (size_t i = 0; i < v.size(); ++i) {
+            if (i > 0) cout << " ";
 
-    // Print each vertex in the path separated by a space
-    for (size_t i = 0; i < v.size(); ++i) {
-        if (i > 0) cout << " ";
-        cout << v[i];
+            cout << v[i];
+        }
+        cout << " " << endl;
     }
-    cout << " " << endl;
-
     cout << "Total cost is " << total << endl;
 }
