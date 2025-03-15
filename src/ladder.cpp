@@ -17,7 +17,8 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
             if (len1 > len2) ++i;
             else if (len1 < len2) ++j;
             else { ++i; ++j; }
-        } else {
+        }
+        else {
             ++i; ++j;
         }
     }
@@ -39,85 +40,76 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
 
     while (!ladders.empty()) {
         int size = ladders.size();
-        // New words found at the current level will be added to new_used_words
-        set<string> new_used_words;
+        set<string> new_used_words;  // words discovered at the current level
 
         for (int i = 0; i < size; ++i) {
             vector<string> ladder = ladders.front();
             ladders.pop();
             string last_word = ladder.back();
 
-            // 1. Substitution candidates: replace each character.
+            vector<string> candidates;
+
+            // 1. Substitution: change each letter to every other letter.
             for (int pos = 0; pos < last_word.size(); ++pos) {
                 string candidate = last_word;
                 for (char c = 'a'; c <= 'z'; ++c) {
                     if (c == last_word[pos])
                         continue;
                     candidate[pos] = c;
-                    if (word_list.find(candidate) == word_list.end())
-                        continue;
-                    if (used_words.find(candidate) != used_words.end())
-                        continue;
-                    
-                    vector<string> new_ladder = ladder;
-                    new_ladder.push_back(candidate);
-                    if (candidate == end_word)
-                        return new_ladder;
-                    ladders.push(new_ladder);
-                    new_used_words.insert(candidate);
+                    if (word_list.find(candidate) != word_list.end() &&
+                        used_words.find(candidate) == used_words.end())
+                    {
+                        candidates.push_back(candidate);
+                    }
                 }
             }
-            
-            // 2. Insertion candidates: insert a letter at every possible position.
+
+            // 2. Insertion: insert a letter at every possible position.
             for (int pos = 0; pos <= last_word.size(); ++pos) {
                 string candidate = last_word;
                 for (char c = 'a'; c <= 'z'; ++c) {
                     candidate.insert(candidate.begin() + pos, c);
-                    if (word_list.find(candidate) == word_list.end()) {
-                        // Remove the inserted char to restore candidate for next iteration.
-                        candidate.erase(candidate.begin() + pos);
-                        continue;
+                    if (word_list.find(candidate) != word_list.end() &&
+                        used_words.find(candidate) == used_words.end())
+                    {
+                        candidates.push_back(candidate);
                     }
-                    if (used_words.find(candidate) != used_words.end()) {
-                        candidate.erase(candidate.begin() + pos);
-                        continue;
-                    }
-                    
-                    vector<string> new_ladder = ladder;
-                    new_ladder.push_back(candidate);
-                    if (candidate == end_word)
-                        return new_ladder;
-                    ladders.push(new_ladder);
-                    new_used_words.insert(candidate);
-                    candidate.erase(candidate.begin() + pos);  // Restore candidate
+                    candidate.erase(candidate.begin() + pos);  // restore candidate
                 }
             }
-            
-            // 3. Deletion candidates: remove one character at each position.
-            if (last_word.size() > 1) {  // Ensure resulting word is not empty.
+
+            // 3. Deletion: remove one letter at each position.
+            if (last_word.size() > 1) {  // Ensure result is non-empty.
                 for (int pos = 0; pos < last_word.size(); ++pos) {
                     string candidate = last_word;
                     candidate.erase(candidate.begin() + pos);
-                    if (word_list.find(candidate) == word_list.end())
-                        continue;
-                    if (used_words.find(candidate) != used_words.end())
-                        continue;
-                    
-                    vector<string> new_ladder = ladder;
-                    new_ladder.push_back(candidate);
-                    if (candidate == end_word)
-                        return new_ladder;
-                    ladders.push(new_ladder);
-                    new_used_words.insert(candidate);
+                    if (word_list.find(candidate) != word_list.end() &&
+                        used_words.find(candidate) == used_words.end())
+                    {
+                        candidates.push_back(candidate);
+                    }
                 }
             }
+
+            // Remove duplicate candidates (if any) and sort them lexicographically.
+            sort(candidates.begin(), candidates.end());
+            candidates.erase(unique(candidates.begin(), candidates.end()), candidates.end());
+
+            // Process candidates in sorted order.
+            for (const string &candidate : candidates) {
+                vector<string> new_ladder = ladder;
+                new_ladder.push_back(candidate);
+                if (candidate == end_word)
+                    return new_ladder;
+                ladders.push(new_ladder);
+                new_used_words.insert(candidate);
+            }
         }
-        // Mark all words used in this level as visited.
+        // Mark all words found in this level as used.
         used_words.insert(new_used_words.begin(), new_used_words.end());
     }
     return {};
 }
-
 
 void load_words(set<string>& word_list, const string& file_name) {
     ifstream file(file_name);
