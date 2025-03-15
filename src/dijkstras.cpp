@@ -19,12 +19,10 @@ vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& prev
     vector<int> dist(n, INF);        // Track the shortest distance to each vertex
     vector<bool> visited(n, false);  // Whether we've permanently set the distance to a vertex
 
-    // Initialize
     dist[source] = 0;
     previous.assign(n, -1);
 
-    // Min-heap priority queue: Node(vertex, distance)
-    priority_queue<Node, vector<Node>, CompareDist> pq;
+    priority_queue<Node, vector<Node>, CompareDist> pq;  // Min-heap priority queue
     pq.push(Node(source, 0));
 
     while (!pq.empty()) {
@@ -32,7 +30,7 @@ vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& prev
         pq.pop();
         int u = current.vertex;
 
-        // If we've already visited this node, skip
+        // If already visited this node then skip
         if (visited[u]) continue;
         visited[u] = true;
 
@@ -41,7 +39,7 @@ vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& prev
             int v = edge.dst;
             int weight = edge.weight;
 
-            // If we find a shorter path to v
+            // If a shorter path to v is found
             if (!visited[v] && dist[u] != INF && dist[u] + weight < dist[v]) {
                 dist[v] = dist[u] + weight;
                 previous[v] = u;
@@ -50,7 +48,7 @@ vector<int> dijkstra_shortest_path(const Graph& G, int source, vector<int>& prev
         }
     }
 
-    return dist; // Contains the shortest distances from 'source' to each vertex
+    return dist;  // Contains the shortest distances from 'source' to each vertex
 }
 
 vector<int> extract_shortest_path(const vector<int>& /*distances*/, const vector<int>& previous, int destination) {

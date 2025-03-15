@@ -4,7 +4,6 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    // string filename = get_arg(argc, argv, "src/small.txt");
     string filename = (argc > 1) ? argv[1] : "src/small.txt";
     Graph G;
     file_to_graph(filename, G);

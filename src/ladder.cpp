@@ -44,14 +44,13 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
         for (int i = 0; i < size; ++i) {
             vector<string> ladder = ladders.front(); ladders.pop();
             string last_word = ladder.back();
-            
             for (const string& word : word_list) {
                 if (used_words.find(word) == used_words.end() && is_adjacent(last_word, word)) {
                     vector<string> new_ladder = ladder;
                     new_ladder.push_back(word);
                     if (word == end_word) return new_ladder;
                     ladders.push(new_ladder);
-                    new_used_words.insert(word);
+                    used_words.insert(word);  // changed from new_used_words.insert(word)
                 }
             }
         }
