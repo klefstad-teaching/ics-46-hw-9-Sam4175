@@ -29,7 +29,7 @@ bool is_adjacent(const string& word1, const string& word2) {
 }
 
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
-    if (begin_word == end_word) return {};  // {begin word}
+    if (begin_word == end_word) return {};
     if (word_list.find(end_word) == word_list.end()) return {};
 
     queue<vector<string>> ladders;
@@ -39,25 +39,85 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
 
     while (!ladders.empty()) {
         int size = ladders.size();
+        // New words found at the current level will be added to new_used_words
         set<string> new_used_words;
 
         for (int i = 0; i < size; ++i) {
-            vector<string> ladder = ladders.front(); ladders.pop();
+            vector<string> ladder = ladders.front();
+            ladders.pop();
             string last_word = ladder.back();
-            for (const string& word : word_list) {
-                if (used_words.find(word) == used_words.end() && is_adjacent(last_word, word)) {
+
+            // 1. Substitution candidates: replace each character.
+            for (int pos = 0; pos < last_word.size(); ++pos) {
+                string candidate = last_word;
+                for (char c = 'a'; c <= 'z'; ++c) {
+                    if (c == last_word[pos])
+                        continue;
+                    candidate[pos] = c;
+                    if (word_list.find(candidate) == word_list.end())
+                        continue;
+                    if (used_words.find(candidate) != used_words.end())
+                        continue;
+                    
                     vector<string> new_ladder = ladder;
-                    new_ladder.push_back(word);
-                    if (word == end_word) return new_ladder;
+                    new_ladder.push_back(candidate);
+                    if (candidate == end_word)
+                        return new_ladder;
                     ladders.push(new_ladder);
-                    used_words.insert(word);  // changed from new_used_words.insert(word)
+                    new_used_words.insert(candidate);
+                }
+            }
+            
+            // 2. Insertion candidates: insert a letter at every possible position.
+            for (int pos = 0; pos <= last_word.size(); ++pos) {
+                string candidate = last_word;
+                for (char c = 'a'; c <= 'z'; ++c) {
+                    candidate.insert(candidate.begin() + pos, c);
+                    if (word_list.find(candidate) == word_list.end()) {
+                        // Remove the inserted char to restore candidate for next iteration.
+                        candidate.erase(candidate.begin() + pos);
+                        continue;
+                    }
+                    if (used_words.find(candidate) != used_words.end()) {
+                        candidate.erase(candidate.begin() + pos);
+                        continue;
+                    }
+                    
+                    vector<string> new_ladder = ladder;
+                    new_ladder.push_back(candidate);
+                    if (candidate == end_word)
+                        return new_ladder;
+                    ladders.push(new_ladder);
+                    new_used_words.insert(candidate);
+                    candidate.erase(candidate.begin() + pos);  // Restore candidate
+                }
+            }
+            
+            // 3. Deletion candidates: remove one character at each position.
+            if (last_word.size() > 1) {  // Ensure resulting word is not empty.
+                for (int pos = 0; pos < last_word.size(); ++pos) {
+                    string candidate = last_word;
+                    candidate.erase(candidate.begin() + pos);
+                    if (word_list.find(candidate) == word_list.end())
+                        continue;
+                    if (used_words.find(candidate) != used_words.end())
+                        continue;
+                    
+                    vector<string> new_ladder = ladder;
+                    new_ladder.push_back(candidate);
+                    if (candidate == end_word)
+                        return new_ladder;
+                    ladders.push(new_ladder);
+                    new_used_words.insert(candidate);
                 }
             }
         }
+        // Mark all words used in this level as visited.
         used_words.insert(new_used_words.begin(), new_used_words.end());
     }
     return {};
 }
+
 
 void load_words(set<string>& word_list, const string& file_name) {
     ifstream file(file_name);
