@@ -77,8 +77,7 @@ vector<int> extract_shortest_path(const vector<int>& /*distances*/, const vector
 
 void print_path(const vector<int>& v, int total) {
     if (v.empty()) {
-        cout << "No path found." << endl;
-        return;
+        cout << endl;  // printing blank line
     }
 
     // Print each vertex in the path separated by a space
