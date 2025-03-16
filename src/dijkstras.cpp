@@ -61,7 +61,7 @@ vector<int> extract_shortest_path(const vector<int>& /*distances*/, const vector
         curr = previous[curr];
     }
 
-    // The path is currently reversed (from destination to source), so reverse it
+    // The path is currently from destination to source, so reverse it
     reverse(path.begin(), path.end());
     return path;
 }

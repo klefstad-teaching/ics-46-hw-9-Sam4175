@@ -1,5 +1,5 @@
 #include "ladder.h"
-// #include <cassert>
+#include <algorithm>
 
 void error(string word1, string word2, string msg) {
     cerr << "Error: " << msg << " (" << word1 << ", " << word2 << ")" << endl;
@@ -49,53 +49,47 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
 
             vector<string> candidates;
 
-            // 1. Substitution: change each letter to every other letter.
+            // 1. Substitution: change each letter to every other letter
             for (int pos = 0; pos < last_word.size(); ++pos) {
                 string candidate = last_word;
                 for (char c = 'a'; c <= 'z'; ++c) {
                     if (c == last_word[pos])
                         continue;
                     candidate[pos] = c;
-                    if (word_list.find(candidate) != word_list.end() &&
-                        used_words.find(candidate) == used_words.end())
-                    {
+                    if (word_list.find(candidate) != word_list.end() && used_words.find(candidate) == used_words.end()) {
                         candidates.push_back(candidate);
                     }
                 }
             }
 
-            // 2. Insertion: insert a letter at every possible position.
+            // 2. Insertion: insert a letter at every possible position
             for (int pos = 0; pos <= last_word.size(); ++pos) {
                 string candidate = last_word;
                 for (char c = 'a'; c <= 'z'; ++c) {
                     candidate.insert(candidate.begin() + pos, c);
-                    if (word_list.find(candidate) != word_list.end() &&
-                        used_words.find(candidate) == used_words.end())
-                    {
+                    if (word_list.find(candidate) != word_list.end() && used_words.find(candidate) == used_words.end()) {
                         candidates.push_back(candidate);
                     }
                     candidate.erase(candidate.begin() + pos);  // restore candidate
                 }
             }
 
-            // 3. Deletion: remove one letter at each position.
-            if (last_word.size() > 1) {  // Ensure result is non-empty.
+            // 3. Deletion: remove one letter at each position
+            if (last_word.size() > 1) {  // Ensure result is non-empty
                 for (int pos = 0; pos < last_word.size(); ++pos) {
                     string candidate = last_word;
                     candidate.erase(candidate.begin() + pos);
-                    if (word_list.find(candidate) != word_list.end() &&
-                        used_words.find(candidate) == used_words.end())
-                    {
+                    if (word_list.find(candidate) != word_list.end() && used_words.find(candidate) == used_words.end()) {
                         candidates.push_back(candidate);
                     }
                 }
             }
 
-            // Remove duplicate candidates (if any) and sort them lexicographically.
+            // Remove duplicate candidates and sort them
             sort(candidates.begin(), candidates.end());
             candidates.erase(unique(candidates.begin(), candidates.end()), candidates.end());
 
-            // Process candidates in sorted order.
+            // Process candidates in sorted order
             for (const string &candidate : candidates) {
                 vector<string> new_ladder = ladder;
                 new_ladder.push_back(candidate);
@@ -105,7 +99,7 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
                 new_used_words.insert(candidate);
             }
         }
-        // Mark all words found in this level as used.
+        // Mark all words found in this level as used
         used_words.insert(new_used_words.begin(), new_used_words.end());
     }
     return {};
@@ -130,13 +124,11 @@ void print_word_ladder(const vector<string>& ladder) {
     }
 
     cout << "Word ladder found: ";
-    
-    // Print each word in the ladder
+
     for (size_t i = 0; i < ladder.size(); ++i) {
         if (i > 0) cout << " ";
         cout << ladder[i];
     }
-    // Print a trailing space and newline
     cout << " " << endl;
 }
 
